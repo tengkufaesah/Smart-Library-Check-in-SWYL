@@ -1,0 +1,17 @@
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDCcdGQHMk5WmMko42hTRGIkr8duN2Kjgw",
+  authDomain: "smart-library-check-in-swyl.firebaseapp.com",
+  projectId: "smart-library-check-in-swyl",
+  storageBucket: "smart-library-check-in-swyl.firebasestorage.app",
+  messagingSenderId: "118372706793",
+  appId: "1:118372706793:web:40ba8e68ba6dc07c6ac378",
+  measurementId: "G-9N5JJJ6CJF"
+};
+
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const db = getFirestore(app);
+
+export { db };
