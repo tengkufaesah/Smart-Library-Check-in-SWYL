@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { LayoutDashboard, Users, BarChart3, Settings, LogOut, ClipboardList, Download, Save, Home, Shield, FileUp, Database, Trash2, Search } from 'lucide-react';
-import { CheckinRecord, SystemSettings, Member } from '@/lib/types';
+import { CheckinRecord, SystemSettings, Member, AdminUser } from '@/lib/types';
 import { generateMockData } from '@/lib/mockData';
 import { doc, deleteDoc, setDoc, collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -14,8 +14,8 @@ interface AdminProps {
   adminName: string;
   onLogout: () => void;
   showToast: (msg: string, type: 'success' | 'error') => void;
-  admins: any[];
-  setAdmins: (admins: any[]) => void;
+  admins: AdminUser[];
+  setAdmins: (admins: AdminUser[]) => void;
   settings: SystemSettings;
 }
 
@@ -238,7 +238,7 @@ export default function Admin({ records, adminName, onLogout, showToast, admins,
     : 0;
 
   // Render Members Logic
-  const uniqueUsers: Record<string, any> = {};
+  const uniqueUsers: Record<string, { name: string, student_id: string, user_type: string, class_level: string, visits: number }> = {};
   checkins.forEach(r => {
     const key = r.student_id || r.name;
     if (!uniqueUsers[key]) uniqueUsers[key] = { name: r.name, student_id: r.student_id, user_type: r.user_type, class_level: r.class_level, visits: 0 };

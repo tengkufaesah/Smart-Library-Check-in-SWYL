@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "CheckinRecord": {
+      "title": "CheckinRecord",
+      "description": "A record of a student or teacher checking in or out of the library.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["checkin"] },
+        "name": { "type": "string" },
+        "student_id": { "type": "string" },
+        "class_level": { "type": "string" },
+        "user_type": { "type": "string", "enum": ["นักเรียน", "ครู/บุคลากร"] },
+        "purpose": { "type": "string" },
+        "check_in_time": { "type": "string", "format": "date-time" },
+        "check_out_time": { "type": "string", "format": "date-time" },
+        "is_checked_out": { "type": "boolean" }
+      },
+      "required": ["type", "name", "student_id", "class_level", "user_type", "purpose", "check_in_time", "is_checked_out"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "General settings for the library check-in system.",
+      "type": "object",
+      "properties": {
+        "schoolName": { "type": "string" },
+        "welcomeText": { "type": "string" },
+        "footerText": { "type": "string" },
+        "studentPurposes": { "type": "array", "items": { "type": "string" } },
+        "teacherPurposes": { "type": "array", "items": { "type": "string" } },
+        "classLevels": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "firestore": {
+    "/checkins/{checkinId}": {
+      "schema": "CheckinRecord",
+      "description": "Collection of library check-in records."
+    },
+    "/settings/general": {
+      "schema": "SystemSettings",
+      "description": "General system settings."
+    }
+  }
+}

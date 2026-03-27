@@ -109,7 +109,7 @@ export default function Stats({ records, settings }: StatsProps) {
   checkins.forEach(r => { 
     userVisits[r.name] = (userVisits[r.name] || 0) + 1; 
   });
-  const superUsers = Object.entries(userVisits).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const superUsers = Object.entries(userVisits).sort((a: [string, number], b: [string, number]) => b[1] - a[1]).slice(0, 10);
 
   // Daily Usage Comparison (Last 7 Days)
   const last7Days = Array.from({ length: 7 }, (_, i) => {

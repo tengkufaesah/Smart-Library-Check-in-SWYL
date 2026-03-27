@@ -8,12 +8,13 @@ export default function Users({ records }: { records: CheckinRecord[] }) {
   const [search, setSearch] = useState('');
 
   const uniqueUsers = useMemo(() => {
-    const userMap = new Map<string, any>();
+    const userMap = new Map<string, { id: string, name: string, student_id: string, class_level: string, user_type: string, visits: number, last_visit: string }>();
     records.forEach(r => {
       const key = r.user_type === 'นักเรียน' ? r.student_id : r.name;
       if (!key) return;
       
-      if (!userMap.has(key)) {
+      const existingUser = userMap.get(key);
+      if (!existingUser) {
         userMap.set(key, {
           id: key,
           name: r.name,
@@ -24,10 +25,9 @@ export default function Users({ records }: { records: CheckinRecord[] }) {
           last_visit: r.check_in_time
         });
       } else {
-        const user = userMap.get(key);
-        user.visits += 1;
-        if (new Date(r.check_in_time) > new Date(user.last_visit)) {
-          user.last_visit = r.check_in_time;
+        existingUser.visits += 1;
+        if (new Date(r.check_in_time) > new Date(existingUser.last_visit)) {
+          existingUser.last_visit = r.check_in_time;
         }
       }
     });

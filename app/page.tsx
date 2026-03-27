@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, doc, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { CheckinRecord, SystemSettings, defaultSettings } from '@/lib/types';
+import { db, handleFirestoreError, OperationType } from '@/lib/firebase';
+import { CheckinRecord, SystemSettings, defaultSettings, AdminUser } from '@/lib/types';
 
 import Header from '@/components/Header';
 import HomeTab from '@/components/Home';
@@ -17,33 +17,36 @@ export default function Page() {
   const [currentPage, setCurrentPage] = useState('home');
   const [records, setRecords] = useState<CheckinRecord[]>([]);
   const [settings, setSettings] = useState<SystemSettings>(defaultSettings);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('lib_dark_mode') === 'true';
-    }
-    return false;
-  });
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   const [toast, setToast] = useState({ message: '', type: 'success' as 'success' | 'error', visible: false });
   
-  const [admins, setAdmins] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedAdmins = localStorage.getItem('lib_admins');
-      return savedAdmins ? JSON.parse(savedAdmins) : [
-        { name: 'Admin', email: 'tengkufaesah@swyl.ac.th', password: '12345' }
-      ];
-    }
-    return [
-      { name: 'Admin', email: 'tengkufaesah@swyl.ac.th', password: '12345' }
-    ];
-  });
+  const [admins, setAdmins] = useState<AdminUser[]>([
+    { name: 'Admin', email: 'tengkufaesah@swyl.ac.th', password: '12345' }
+  ]);
   const [loggedInAdmin, setLoggedInAdmin] = useState('');
+
+  useEffect(() => {
+    // Load from localStorage on client
+    const savedDarkMode = localStorage.getItem('lib_dark_mode') === 'true';
+    const savedAdmins = localStorage.getItem('lib_admins');
+    
+    setTimeout(() => {
+      setIsDarkMode(savedDarkMode);
+      if (savedAdmins) {
+        setAdmins(JSON.parse(savedAdmins));
+      }
+    }, 0);
+  }, []);
 
   useEffect(() => {
     // Apply dark mode class on initial load
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
       document.body.classList.add('dark-mode');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark-mode');
     }
 
     // Subscribe to Firestore
@@ -55,7 +58,7 @@ export default function Page() {
       })) as CheckinRecord[];
       setRecords(data);
     }, (error) => {
-      console.error("Firestore Error: ", error);
+      handleFirestoreError(error, OperationType.GET, 'checkins');
     });
 
     // Subscribe to Settings
@@ -82,6 +85,8 @@ export default function Page() {
       } else {
         setSettings(defaultSettings);
       }
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'settings/general');
     });
 
     return () => {
@@ -123,7 +128,7 @@ export default function Page() {
     setCurrentPage('home');
   };
 
-  const handleSetAdmins = (newAdmins: any[]) => {
+  const handleSetAdmins = (newAdmins: AdminUser[]) => {
     setAdmins(newAdmins);
     localStorage.setItem('lib_admins', JSON.stringify(newAdmins));
   };

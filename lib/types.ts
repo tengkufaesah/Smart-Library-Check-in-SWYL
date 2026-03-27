@@ -1,3 +1,9 @@
+export interface AdminUser {
+  name: string;
+  email: string;
+  password?: string;
+}
+
 export interface CheckinRecord {
   id?: string;
   type: 'checkin';
